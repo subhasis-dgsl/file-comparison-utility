@@ -7,11 +7,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,17 +25,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.record.formula.functions.Count;
-
 import main.utility.Constants;
 
 import com.dgsl.imp.main.java.bo.FileDetail;
-import com.dgsl.imp.main.java.service.compareContents.CompareContents;
 import com.dgsl.imp.main.java.service.extractFile.EarFileExtraction;
 import com.dgsl.imp.main.java.service.report.ReportGenerator;
+
 
 
 /**
@@ -189,11 +189,19 @@ public class CompareDirectory extends AbstractCompare {
 				System.out.println(fileArr[i].getName());
 				//	FileUtils.copyDirectory(fileArr[i].getParentFile(), destDir);
 				
-					
+				
+				/*
+				 * Code:To check the file on the basis of created date, modified date,
+				 * size and file name. 
+				 * */
+			
+				FileDetail individualFileDetail1=getFileDetails(fileArr[i]);
+				FileDetail individualFileDetail2=getFileDetails(srcfComp);
 
-					String cSum1 = checksum(fileArr[i]);
+					/*String cSum1 = checksum(fileArr[i]);
 					String cSum2 = checksum(srcfComp);
-					if(!cSum1.equals(cSum2))
+					if(!cSum1.equals(cSum2))*/
+				if(!individualFileDetail1.equals(individualFileDetail2))
 					{
 						System.out.println(fileArr[i].getName()+"\t\t"+ "different");
 						
@@ -304,6 +312,29 @@ public class CompareDirectory extends AbstractCompare {
 		}
 		return fileDetails;
 	}*/
+	
+	
+	/*
+	 * method created to get the created date, modified date,
+	 *  size and file name for comparison 
+	 *  - John Aby 20/7/2017
+	 * */
+	private FileDetail getFileDetails(File file) throws IOException{
+		FileDetail fileCompareDetails=new FileDetail();
+		SimpleDateFormat sdf= new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Path path = Paths.get(file.getAbsolutePath());
+	    BasicFileAttributes view = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
+	  
+	    
+	    fileCompareDetails.setCreatedDate(sdf.format(view.creationTime().toMillis()));
+	    fileCompareDetails.setModifiedDate(sdf.format(view.lastModifiedTime().toMillis()));
+	    fileCompareDetails.setFileSize(view.size());
+	    fileCompareDetails.setFileName(file.getName());  
+		
+		return fileCompareDetails ;
+	}
+	
+	
 	
 	public String checksum(File file) 
 	{
