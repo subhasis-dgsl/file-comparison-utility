@@ -34,7 +34,7 @@ public class EarFileExtraction {
 		while (enu.hasMoreElements()) {
 			String destdir = null;
 			if(pathFlag){
-				destdir= "/compare/src"/*+"/"+"IBM_BPM_"+fileNameWOExt+"_BPMPCENV.AppTarget.ear"*/;
+				destdir= "/compare/src/"+fileNameWOExt/*+"/"+"IBM_BPM_"+fileNameWOExt+"_BPMPCENV.AppTarget.ear"*/;
 			}else{
 				destdir = "/compare/dest/"+fileNameWOExt/*+"/"+"IBM_BPM_"+fileNameWOExt+"_BPMPCENV.AppTarget.ear"*/;// abc is my destination directory
 			}
@@ -43,15 +43,7 @@ public class EarFileExtraction {
 			System.out.println(je.getName());
 			
 			java.io.File fl = new java.io.File(destdir, je.getName());
-			String fileExt = getFileExtension(fl);
-			System.out.println("=================="+fileExt+"==============");
-
-			if("war".equals(fileExt)){
-				System.out.println(fl.getCanonicalPath()+"========"+fl.getAbsolutePath());
-				System.out.println("***********************"+fl.getParentFile().getAbsolutePath());
-				String fln = fl.getName().substring(0, fl.getName().lastIndexOf("."));
-				extractEar(fl.getAbsolutePath(), fl.getName(), pathFlag);
-			}
+			
 			
 			
 			if (!fl.exists()) {
@@ -65,6 +57,14 @@ public class EarFileExtraction {
 			java.io.FileOutputStream fo = new java.io.FileOutputStream(fl);
 			while (is.available() > 0) {
 				fo.write(is.read());
+			}
+			String fileExt = getFileExtension(fl);
+			System.out.println("=================="+fileExt+"==============");
+			if("war".equals(fileExt)){
+				System.out.println(fl.getCanonicalPath()+"========"+fl.getAbsolutePath());
+				System.out.println("***********************"+fl.getParentFile().getAbsolutePath());
+				String fln = fl.getName().substring(0, fl.getName().lastIndexOf("."));
+				extractEar(fl.getAbsolutePath(), fl.getName(), pathFlag);
 			}
 			fo.close();
 			is.close();
